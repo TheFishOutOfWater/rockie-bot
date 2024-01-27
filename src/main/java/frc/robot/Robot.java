@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -21,34 +22,37 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  private Talon m_lmoter1 = new Talon(0);
-  private Talon m_lmoter2 = new Talon(1);
-  private Talon m_rmoter1 = new Talon(2);
-  private Talon m_rmoter2 = new Talon(3);
+  private Talon m_lmoter1 = new Talon(robotMap.lmoter1ID);
+  private Talon m_lmoter2 = new Talon(robotMap.lmoter2ID);
+  private Talon m_rmoter1 = new Talon(robotMap.rmoter1ID);
+  private Talon m_rmoter2 = new Talon(robotMap.rmoter2ID);
 
-  private Talon m_climbmoter1 = new Talon(6);
-  private Talon m_climbmoter2 = new Talon(7);
-  private Talon m_ampmoter1 = new Talon(8);
-  private Talon m_ampmoter2 = new Talon(8);
-  private Talon m_spmoter1 = new Talon(9);
-  private Talon m_spmoter2 = new Talon(10);
+  private Talon m_climbmoter1 = new Talon(robotMap.climbmoter1ID);
+  private Talon m_climbmoter2 = new Talon(robotMap.climbmoter2ID);
+  private Talon m_ampmoter1 = new Talon(robotMap.ampmoter1ID);
+  private Talon m_ampmoter2 = new Talon(robotMap.ampmoter2ID);
+  private Talon m_spmoter1 = new Talon(robotMap.spmoter1ID);
+  private Talon m_spmoter2 = new Talon(robotMap.spmoter2ID);
 
   private MotorControllerGroup m_lmotor = new MotorControllerGroup(m_lmoter1, m_lmoter2);
   private MotorControllerGroup m_rmotor = new MotorControllerGroup(m_rmoter1, m_rmoter2);
 
   private DifferentialDrive diffDrive = new DifferentialDrive(m_lmotor, m_rmotor);
 
-  private XboxController driver = new XboxController(0);
+  private XboxController driver = new XboxController(robotMap.driverControllerPort);
+
+  Timer timer = new Timer();
 
   private boolean speakermode = (false);
+  private boolean redteam = (true);
   private int station;
   
 
   @Override
   public void robotInit() {
-    if(driver.getRightBumper()){
+    if(driver.getRightBumper() && speakermode==false){
       speakermode = true;
-    }else if(driver.getRightBumper()){
+    }else if(driver.getRightBumper() && speakermode){
       speakermode = false;
     }
     //for(int i=1;driver.getLeftBumper()==true;i++){}
@@ -76,8 +80,63 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {
-
+  public void autonomousInit(){
+    if(speakermode){
+      if(redteam){
+        if(station==1){
+          if(timer.get()<=2){
+            diffDrive.arcadeDrive(robotMap.wheelsMaxSpeed, -robotMap.rotationMaxSpeed);
+          }else if(timer.get()>2&&timer.get()<=5){
+            m_spmoter1.set(robotMap.shootSpeakerMaxSpeed);
+            m_spmoter2.set(robotMap.shootSpeakerMaxSpeed);
+          }else if (timer.get()>5&&timer.get()<=7){
+            diffDrive.arcadeDrive(-robotMap.wheelsMaxSpeed, 0);
+            m_spmoter1.set(0);
+            m_spmoter2.set(0);
+          }else{
+            diffDrive.arcadeDrive(0,0);
+          }
+        }else if(station==2){
+          
+        }else if(station==3){
+        
+        }else if(station==4){
+        
+        }
+      }else{
+        if(station==1){
+          //station speaker auto code goes here
+         }else if(station==2){
+           
+         }else if(station==3){
+         
+         }else if(station==4){
+         
+         }
+      }
+    }else{
+      if(redteam){
+        if(station==1){
+         //station speaker auto code goes here
+        }else if(station==2){
+          
+        }else if(station==3){
+        
+        }else if(station==4){
+        
+        }
+      }else{
+        if(station==1){
+          //station speaker auto code goes here
+         }else if(station==2){
+           
+         }else if(station==3){
+         
+         }else if(station==4){
+         
+         }
+      }
+    }
   }
   @Override
   public void autonomousPeriodic() {}
@@ -90,11 +149,11 @@ public class Robot extends TimedRobot {
     
     if(speakermode){
       //speaker code goes here
-      diffDrive.arcadeDrive(driver.getRawAxis(4)*.7, driver.getRawAxis(1)*.7);
-
+      diffDrive.arcadeDrive(driver.getRawAxis(4)*robotMap.wheelsMaxSpeed, driver.getRawAxis(1)*robotMap.wheelsMaxSpeed);
+      
     }else{
       //amp code goes here
-      diffDrive.arcadeDrive(driver.getRawAxis(4)*.7, driver.getRawAxis(1)*.7);
+      diffDrive.arcadeDrive(driver.getRawAxis(4)*robotMap.wheelsMaxSpeed, driver.getRawAxis(1)*robotMap.wheelsMaxSpeed);
     }
     if(driver.getRawButton(4)){
       //climber code goes here
